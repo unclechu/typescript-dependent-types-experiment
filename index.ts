@@ -19,6 +19,8 @@ function dbQuery<K extends DbRequestKind>(req: DbRequest<K>): DbResponse<K> {
     const result = [10,20,30]
     return result as DbResponse<K> // FIXME doesn’t check valid K
   } else if (req.kind === 'DbRequestGetNewsItemById') {
+    // FIXME “Property 'newsId' does not exist on type 'DbRequest<K>'.”
+    // const result = req.newsId + 10
     const result = 10
     return result as DbResponse<K> // FIXME doesn’t check valid K
   } else {
@@ -26,11 +28,22 @@ function dbQuery<K extends DbRequestKind>(req: DbRequest<K>): DbResponse<K> {
   }
 }
 
-const x = dbQuery({ kind: 'DbRequestGetNewsList' })
+{
+  const x = dbQuery({ kind: 'DbRequestGetNewsList' })
 
-// checks that response is inferred
-const y: typeof x = [10]
+  // Check that response type is inferred
+  const y: typeof x = [10]
+  // const z: typeof x = 10 // fails (as intended, it’s good)
 
-// const z: typeof x = 10 // fails (as intended, it’s good)
+  console.log('DB response (list):', x);
+}
 
-console.log('DB response:', x);
+{
+  const x = dbQuery({ kind: 'DbRequestGetNewsItemById', newsId: 5 })
+
+  // Check that response type is inferred
+  // const y: typeof x = [10] // fails (as intended, it’s good)
+  const z: typeof x = 10
+
+  console.log('DB response (item by id):', x);
+}
