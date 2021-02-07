@@ -4,14 +4,15 @@ type DbRequestKind =
   | 'DbRequestGetNewsList'
   | 'DbRequestGetNewsItemById'
 
-type DbRequest<K extends DbRequestKind> =
-  | { kind: K & 'DbRequestGetNewsList' }
-  | { kind: K & 'DbRequestGetNewsItemById', newsId: NewsId }
+type DbRequest<K extends DbRequestKind>
+  = K extends 'DbRequestGetNewsList'     ? { kind: K }
+  : K extends 'DbRequestGetNewsItemById' ? { kind: K, newsId: NewsId }
+  : never;
 
-type DbResponse<K extends DbRequestKind> =
-  K extends 'DbRequestGetNewsList'     ? number[] :
-  K extends 'DbRequestGetNewsItemById' ? number   :
-  never
+type DbResponse<K extends DbRequestKind>
+  = K extends 'DbRequestGetNewsList'     ? number[]
+  : K extends 'DbRequestGetNewsItemById' ? number
+  : never
 
 function dbQuery<K extends DbRequestKind>(req: DbRequest<K>): DbResponse<K> {
   if (req.kind === 'DbRequestGetNewsList') {
@@ -29,6 +30,7 @@ const x = dbQuery({ kind: 'DbRequestGetNewsList' })
 
 // checks that response is inferred
 const y: typeof x = [10]
-const z: typeof x = 10 // FIXME this should fail! K is not inferred in the reponse!
+
+// const z: typeof x = 10 // fails (as intended, it’s good)
 
 console.log('DB response:', x);
