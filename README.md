@@ -19,3 +19,8 @@ Run:
    [TypeScript chat](https://app.element.io/#/room/#typescript:matrix.org/$161270868411548KHNMQ:gitter.im)
    for fixing one of the problems
    (inferring response type after a call of `dbQuery`)
+
+## See also
+
+A question on Stack Overflow:
+https://stackoverflow.com/questions/66119146/typescript-how-to-make-generic-type-to-infer-inside-a-function
