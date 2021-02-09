@@ -33,6 +33,7 @@ function dbQuery<K extends DbRequestKind>(req: DbRequest<K>): DbResponse<K> {
     } else if (req.kind === 'DbRequestGetNewsItemById') {
       return dbNewsItem(req)
     } else {
+      const _: never = req
       throw new Error('Unexpected kind!')
     }
   })(
