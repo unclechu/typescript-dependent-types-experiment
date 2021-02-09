@@ -7,25 +7,37 @@ type DbRequestKind =
 type DbRequest<K extends DbRequestKind>
   = K extends 'DbRequestGetNewsList'     ? { kind: K }
   : K extends 'DbRequestGetNewsItemById' ? { kind: K, newsId: NewsId }
-  : never;
+  : never
 
 type DbResponse<K extends DbRequestKind>
   = K extends 'DbRequestGetNewsList'     ? number[]
   : K extends 'DbRequestGetNewsItemById' ? number
   : never
 
+function dbNewsList(
+  req: DbRequest<'DbRequestGetNewsList'>
+): DbResponse<'DbRequestGetNewsList'> {
+  return [10, 20, 30]
+}
+
+function dbNewsItem(
+  req: DbRequest<'DbRequestGetNewsItemById'>
+): DbResponse<'DbRequestGetNewsItemById'> {
+  return req.newsId + 10
+}
+
 function dbQuery<K extends DbRequestKind>(req: DbRequest<K>): DbResponse<K> {
-  if (req.kind === 'DbRequestGetNewsList') {
-    const result = [10,20,30]
-    return result as DbResponse<K> // FIXME doesn’t check valid K
-  } else if (req.kind === 'DbRequestGetNewsItemById') {
-    // FIXME “Property 'newsId' does not exist on type 'DbRequest<K>'.”
-    // const result = req.newsId + 10
-    const result = 10
-    return result as DbResponse<K> // FIXME doesn’t check valid K
-  } else {
-    throw new Error('Unexpected kind!')
-  }
+  return (req => {
+    if (req.kind === 'DbRequestGetNewsList') {
+      return dbNewsList(req)
+    } else if (req.kind === 'DbRequestGetNewsItemById') {
+      return dbNewsItem(req)
+    } else {
+      throw new Error('Unexpected kind!')
+    }
+  })(
+    req as DbRequest<'DbRequestGetNewsList' | 'DbRequestGetNewsItemById'>
+  ) as DbResponse<K>;
 }
 
 {
@@ -35,7 +47,7 @@ function dbQuery<K extends DbRequestKind>(req: DbRequest<K>): DbResponse<K> {
   const y: typeof x = [10]
   // const z: typeof x = 10 // fails (as intended, it’s good)
 
-  console.log('DB response (list):', x);
+  console.log('DB response (list):', x)
 }
 
 {
@@ -45,5 +57,5 @@ function dbQuery<K extends DbRequestKind>(req: DbRequest<K>): DbResponse<K> {
   // const y: typeof x = [10] // fails (as intended, it’s good)
   const z: typeof x = 10
 
-  console.log('DB response (item by id):', x);
+  console.log('DB response (item by id):', x)
 }
