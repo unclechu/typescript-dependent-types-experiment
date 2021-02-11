@@ -20,6 +20,9 @@ Run:
    for fixing one of the problems
    (inferring response type after a call of `dbQuery`)
 
+3. [@jcalz](https://github.com/jcalz)
+   for his idea with `T[K]` hack on [Stack Overflow](https://stackoverflow.com/a/66127276)
+
 ## See also
 
 A question on Stack Overflow:

@@ -1,44 +1,32 @@
 type NewsId = number
 
-type DbRequestKind =
-  | 'DbRequestGetNewsList'
-  | 'DbRequestGetNewsItemById'
+type DbRequestKind = keyof DbResponseMap
 
 type DbRequest<K extends DbRequestKind>
   = K extends 'DbRequestGetNewsList'     ? { kind: K }
   : K extends 'DbRequestGetNewsItemById' ? { kind: K, newsId: NewsId }
   : never
 
-type DbResponse<K extends DbRequestKind>
-  = K extends 'DbRequestGetNewsList'     ? number[]
-  : K extends 'DbRequestGetNewsItemById' ? number
-  : never
-
-function dbNewsList(
-  req: DbRequest<'DbRequestGetNewsList'>
-): DbResponse<'DbRequestGetNewsList'> {
-  return [10, 20, 30]
+interface DbResponseMap {
+  DbRequestGetNewsList: number[]
+  DbRequestGetNewsItemById: number
 }
 
-function dbNewsItem(
-  req: DbRequest<'DbRequestGetNewsItemById'>
-): DbResponse<'DbRequestGetNewsItemById'> {
-  return req.newsId + 10
-}
+type DbResponse<K extends DbRequestKind> = DbResponseMap[K]
 
 function dbQuery<K extends DbRequestKind>(req: DbRequest<K>): DbResponse<K> {
   return (req => {
     if (req.kind === 'DbRequestGetNewsList') {
-      return dbNewsList(req)
+      const result: DbResponseMap[typeof req.kind] = [10, 20, 30]
+      return result
     } else if (req.kind === 'DbRequestGetNewsItemById') {
-      return dbNewsItem(req)
+      const result: DbResponseMap[typeof req.kind] = req.newsId + 10
+      return result
     } else {
       const _: never = req
       throw new Error('Unexpected kind!')
     }
-  })(
-    req as DbRequest<'DbRequestGetNewsList' | 'DbRequestGetNewsItemById'>
-  ) as DbResponse<K>;
+  })(req as DbRequest<DbRequestKind>) as DbResponse<K>
 }
 
 {
